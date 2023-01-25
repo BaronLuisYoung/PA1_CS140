@@ -42,5 +42,5 @@ double parallel_pi(long long int number_of_tosses, int my_rank, int no_proc,
   MPI_Reduce(&number_in_circle, &sum, 1, MPI_INT, MPI_SUM, 0, comm);
 
   pi_estimate = 4 * number_in_circle / ((double)number_of_tosses);
-  return pi_estimate;
+  return pi_estimate; 
 }
