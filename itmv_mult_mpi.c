@@ -74,7 +74,7 @@ int itmv_mult(double local_A[] /* in */, double local_x[] /* in */,
               int my_rank /* in */, int no_proc /* in */,
               MPI_Comm comm /* in */) {
   double *x;
-  int local_i, j, start, k;
+  int local_i, j, start, k, i;
   int succ, all_succ;
 
   if (n <= 0 || blocksize <= 0 || local_A == NULL || local_x == NULL ||
@@ -86,8 +86,40 @@ int itmv_mult(double local_A[] /* in */, double local_x[] /* in */,
     return 0;
 
   /* Your solution */
-
-  return 1;
+  if(matrix_type != UPPER_TRIANGULAR)  //if not an upper trianlge 
+  { 
+    for(k=0; k < t; k++) // for t iterations 
+    {
+      //for each block section (splits up rows based on processor count)
+      for(i=my_rank * blocksize; i < (my_rank+1) * blocksize; i++)
+      {
+        //for each value in row 
+        for(j=0; j<n; j++)
+        {
+          //compute the local m[][] * v[] cell 
+          local_y[k] = local_y[k] + local_A[(i * n) + j] * local_d[j];
+        }
+        //save the local value into the return array 
+        local_x[i] = local_y[k];
+      }
+    }
+  }
+  else //same comments as above except for line 114
+  {
+     for(k=0; k < t; k++)
+    {
+      for(i= my_rank * blocksize; i < (my_rank+1) * blocksize; i++)
+      {
+        //compute the upper triangle only, starting at i = j 
+        for(j=i; j<n; j++) //only change 
+        {
+          local_y[k] = local_y[k] + local_A[(i * n) + j] * local_d[j];
+        }
+        local_x[i] = local_y[k];
+      }
+    }
+  }
+  return 1; 
 }
 
 /*-------------------------------------------------------------------
@@ -120,7 +152,7 @@ int itmv_mult(double local_A[] /* in */, double local_x[] /* in */,
 int itmv_mult_seq(double A[], double x[], double d[], double y[],
                   int matrix_type, int n, int t) {
   int i, j, start, k;
-
+  
   if (n <= 0 || A == NULL || x == NULL || d == NULL || y == NULL) return 0;
 
   for (k = 0; k < t; k++) {

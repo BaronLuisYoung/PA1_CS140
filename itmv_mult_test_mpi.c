@@ -250,7 +250,59 @@ int init_matrix(double *local_A, double *local_x, double *local_d,
       local_y == NULL || blocksize <= 0)
     return FAIL;
 
-  /* Your solution */
+  int i, j;
+  //init x array
+  for(i=0; i<n ; i++)
+  {
+    local_x[i] = 0.0; 
+  }
+  //init d array
+  for(i=0; i<n; i++)
+  {
+    local_d[i] = (double)(2*(n-1)/n); 
+  }
+  //init y array
+  for(i=0; i<n;i++)
+  {
+    local_y[i*n + j] = 0.0;
+  }  
+
+   //A[i,i]=0 for diagnal elements. A[i,j]=-1/n for non-diagonal elements.
+  //init matrix a
+  if(matrix_type != UPPER_TRIANGULAR)
+  {  
+    for(i=0; i<n;i++)
+    {
+      for(j=0; j<n;j++)
+      {
+        if(i == j)
+        {
+          local_A[i*n + j] = 0.0;
+        }
+        else
+        {
+          local_A[i*n + j] = -1/n;
+        }
+      }
+    }  
+  }
+  else
+  {
+    for(i=0; i<n;i++)
+    {
+      for(j=0; j<n;j++)
+      {
+        if(i <= j)
+        {
+          local_A[i*n + j] = 0.0;
+        }
+        else
+        {
+          local_A[i*n + j] = -1/n;
+        }
+      }
+    }  
+  }
   return SUCC;
 }
 
