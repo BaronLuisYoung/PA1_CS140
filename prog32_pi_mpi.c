@@ -31,6 +31,7 @@ double parallel_pi(long long int number_of_tosses, int my_rank, int no_proc,
   double distance_squared;
   long long int number_in_circle = 0;
   long long int sum; 
+  int i;
   for (i = 0; i < (number_of_tosses/no_proc); i++) {
     x = 2 * random() / ((double)RAND_MAX) - 1.0;
     y = 2 * random() / ((double)RAND_MAX) - 1.0;
@@ -41,6 +42,6 @@ double parallel_pi(long long int number_of_tosses, int my_rank, int no_proc,
   }
   MPI_Reduce(&number_in_circle, &sum, 1, MPI_INT, MPI_SUM, 0, comm);
 
-  pi_estimate = 4 * number_in_circle / ((double)number_of_tosses);
+  pi_estimate = 4 * sum / ((double)number_of_tosses);
   return pi_estimate;
 }
