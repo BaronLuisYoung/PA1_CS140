@@ -28,7 +28,26 @@ int global_sum(int my_int, int my_rank, int no_proc, MPI_Comm comm);
  */
 char *treesum_test1() {
   /* Your solution */
-  return "Not tested";
+  int values[5] = {1, 5, 10, 1, 1};
+
+  MPI_Scatter(&values, 1, MPI_INT, &values, 1, MPI_INT, 0, comm);
+  int result = global_sum(values[my_rank], my_rank, no_proc, comm);
+
+  // MPI_Gather = (values[my_rank])
+  // printf("\n\nResult: %d\n\n", result);
+  int summation = 0;
+  int i;
+  for(i=0; i<no_proc;i++){
+    summation+=values[i];
+  }
+
+  if(my_rank == 0) {
+  // printf("sum: %d\n",summation);
+  // printf("Result: %d\n", result);
+  // printf("Condition: %d\n", result == summation);
+  mu_assert("Failed Test Case!", result == summation);
+  return 0;
+  }
 }
 
 /*-------------------------------------------------------------------
