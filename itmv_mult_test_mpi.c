@@ -249,58 +249,29 @@ int init_matrix(double *local_A, double *local_x, double *local_d,
   if (local_A == NULL || local_x == NULL || local_d == NULL ||
       local_y == NULL || blocksize <= 0)
     return FAIL;
-
   int i, j;
-  //init x array
-  for(i=0; i<n ; i++)
-  {
-    local_x[i] = 0.0; 
-  }
-  //init d array
-  for(i=0; i<n; i++)
-  {
-    //local_d[i] = (double)(2*n-1)/n; 
-    local_d[i] = 0.0;
-  }
-  //init y array
-  for(i=0; i<n;i++)
-  {
-    local_y[i] = 0.0;
-  }  
-
-   //A[i,i]=0 for diagnal elements. A[i,j]=-1/n for non-diagonal elements.
-  //init matrix a
-   
-for(i=0; i<n;i++)
-{
-      for(j=0; j<n;j++)
-      {
-        if(matrix_type != UPPER_TRIANGULAR)
-        {
-          if(i == j)
-          {
-            //local_A[i*n + j] = 0.0;
-            local_A[i*n + j] = 1.0;
-          }
-          else
-          {
-           // local_A[i*n + j] = -1/n;
-           local_A[i*n + j] = 1.0;
-          }
-        }
-        else
-        {     
-          if(i <= j)
-          {
-            local_A[i*n + j] = 0.0;
-          }
-          else
-          {
-            local_A[i*n + j] = -1/n;
-          }
-        }
+  if(matrix_type != UPPER_TRIANGULAR){
+    for(i = 0; i < blocksize; i++){
+      local_d[i] = (2.0*n - 1)/n;
+      local_x[i] = 0;
+      for(j = 0; j < n; j++){
+        local_A[i*n + j] = ((-1.0) / n);
+        if((i + my_rank*blocksize) == j)
+          local_A[i*n + j] = 0;
       }
-}  
+    }
+  }
+  else{
+   for(i = 0; i < blocksize; i++){
+      local_d[i] = (2.0*n - 1)/n;
+      local_x[i] = 0;
+      for(j = 0; j < n; j++){
+        local_A[i*n + j] = ((-1.0) / n);
+        if((i + my_rank*blocksize) > j)
+          local_A[i*n + j] = 0;
+      }
+    }
+  }  
   return SUCC;
 }
 
