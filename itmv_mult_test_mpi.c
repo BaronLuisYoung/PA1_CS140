@@ -259,50 +259,48 @@ int init_matrix(double *local_A, double *local_x, double *local_d,
   //init d array
   for(i=0; i<n; i++)
   {
-    local_d[i] = (double)(2*(n-1)/n); 
+    //local_d[i] = (double)(2*n-1)/n; 
+    local_d[i] = 0.0;
   }
   //init y array
   for(i=0; i<n;i++)
   {
-    local_y[i*n + j] = 0.0;
+    local_y[i] = 0.0;
   }  
 
    //A[i,i]=0 for diagnal elements. A[i,j]=-1/n for non-diagonal elements.
   //init matrix a
-  if(matrix_type != UPPER_TRIANGULAR)
-  {  
-    for(i=0; i<n;i++)
-    {
+   
+for(i=0; i<n;i++)
+{
       for(j=0; j<n;j++)
       {
-        if(i == j)
+        if(matrix_type != UPPER_TRIANGULAR)
         {
-          local_A[i*n + j] = 0.0;
+          if(i == j)
+          {
+            //local_A[i*n + j] = 0.0;
+            local_A[i*n + j] = 1.0;
+          }
+          else
+          {
+           // local_A[i*n + j] = -1/n;
+           local_A[i*n + j] = 1.0;
+          }
         }
         else
-        {
-          local_A[i*n + j] = -1/n;
+        {     
+          if(i <= j)
+          {
+            local_A[i*n + j] = 0.0;
+          }
+          else
+          {
+            local_A[i*n + j] = -1/n;
+          }
         }
       }
-    }  
-  }
-  else
-  {
-    for(i=0; i<n;i++)
-    {
-      for(j=0; j<n;j++)
-      {
-        if(i <= j)
-        {
-          local_A[i*n + j] = 0.0;
-        }
-        else
-        {
-          local_A[i*n + j] = -1/n;
-        }
-      }
-    }  
-  }
+}  
   return SUCC;
 }
 
