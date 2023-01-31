@@ -288,7 +288,7 @@ for(i=0; i<n;i++)
            local_A[i*n + j] = 1.0;
           }
         }
-        else
+        else 
         {     
           if(i <= j)
           {

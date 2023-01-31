@@ -90,7 +90,7 @@ printf("\n");
 
  for (k = 0; k < t; k++) 
  {
-    for(i=my_rank * blocksize; i < (my_rank + blocksize); i++)
+    for(i=my_rank * blocksize; i < (my_rank + blocksize); i++) 
     {
       local_y[i] = local_d[i];
       if (matrix_type == UPPER_TRIANGULAR) 
