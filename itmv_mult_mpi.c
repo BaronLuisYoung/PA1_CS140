@@ -73,7 +73,7 @@ int itmv_mult(double local_A[] /* in */, double local_x[] /* in */,
               int n /* in */, int t /* in */, int blocksize /* in */,
               int my_rank /* in */, int no_proc /* in */,
               MPI_Comm comm /* in */) {
-  double *x ;
+  double *x;
   int local_i, j, start, k, i;
   int succ, all_succ;
 
@@ -84,47 +84,63 @@ int itmv_mult(double local_A[] /* in */, double local_x[] /* in */,
     return 0;
   if (n / no_proc != blocksize) /* wrong local array size */
     return 0;
-printf("\n");
-printf(" n :  %d ",n);
-printf("\n");
+  
+  x = malloc(n * sizeof(double));
+  succ = x != NULL;
+  MPI_Allreduce(&succ, &all_succ, 1, MPI_INT, MPI_PROD, comm);
+  if (all_succ == 0) return 0;
 
  for (k = 0; k < t; k++) 
  {
-    for(i=my_rank * blocksize; i < (my_rank + blocksize); i++) 
+    MPI_Allgather(local_x, blocksize, MPI_DOUBLE, x, blocksize, MPI_DOUBLE, comm);
+    //printf("\n BREAK \n");
+    //printf("\n");
+    //printf(" x_i :  %d, %d, %d, %d", x[0], x[1], x[2], x[3]);
+    //\printf("\n");
+
+    for(local_i = 0; local_i < blocksize; local_i++)
     {
-      local_y[i] = local_d[i];
+      local_y[local_i] = local_d[local_i];
       if (matrix_type == UPPER_TRIANGULAR) 
       {
-        start = i;
+        start = local_i + (blocksize * my_rank) + 1;
       } 
       else 
       {
         start = 0;
       }
+
       for (j = start; j < n; j++) {
-        local_y[i] += local_A[i * n + j] * local_x[j];
-         printf(" y: %f ",local_y[i]);
-         printf(" x: %f ",local_x[i]);
-         printf(" i: %d ", i);
-         printf(" j: %d ", j);
-         printf("\n");
+        local_y[local_i] += local_A[local_i * n + j] * x[j];
+         //printf(" y: %f ",local_y[local_i]);
+        // printf(" x: %f ", x[local_i]);
+        // printf(" i: %d ", i);
+        // printf(" j: %d ", j);
+        // printf("\n");
       }
+
     }
-    for(i=my_rank * blocksize; i < (my_rank + blocksize); i++)
+
+    for(local_i=0; local_i < blocksize; local_i++)
     {
-      local_x[i] = local_y[i];
+       local_x[local_i] = local_y[local_i];
+       //printf(" i_x: %d ", i);
+      // printf(" x: %f ",local_x[local_i]);
+      // printf("\n");
     }
   }
-  MPI_Gather(local_x, blocksize, MPI_DOUBLE, global_x, blocksize, MPI_DOUBLE, 0, comm);
+  MPI_Gather(local_x, blocksize, MPI_DOUBLE, x, blocksize, MPI_DOUBLE, 0, comm);
   
   if (my_rank == 0)
   {
-      printf("break");
-      for (i = 0; i < n; i++)
-      printf("%f ",global_x[i]);
-      printf("\n");
+      //printf("break");
+      for (i = 0; i < n; i++){
+      global_x[i] = x[i];
+     // printf("%f \n", global_x[i]);
+      }
   }
 
+  free(x);
   
   return 1; 
 }
