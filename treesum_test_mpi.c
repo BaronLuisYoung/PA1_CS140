@@ -28,7 +28,7 @@ int global_sum(int my_int, int my_rank, int no_proc, MPI_Comm comm);
  */
 char *treesum_test1() {
   /* Your solution */
-  int values[5] = {1, 1, 1, 1};
+  int values[4] = {1, 1, 1, 1};
 
   MPI_Scatter(&values, 1, MPI_INT, &values, 1, MPI_INT, 0, comm);
   int result = global_sum(values[my_rank], my_rank, no_proc, comm);
